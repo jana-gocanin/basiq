@@ -1,0 +1,42 @@
+.data-display {
+  margin-top: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+th,
+td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+/* .positive {
+  background-color: rgb(107, 184, 107);
+}
+
+.negative {
+  background-color: rgb(185, 120, 120);
+}
+
+.green {
+  color: rgb(107, 184, 107);
+}
+
+.red {
+  color: rgb(185, 120, 120);
+}
+
+p {
+  margin: 20px;
+  font-size: large;
+  color: rgb(68, 58, 58);
+} */
