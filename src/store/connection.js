@@ -1,12 +1,13 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { getAccessToken } from "../store/api";
+import { setError } from "./error";
 
 const accessToken = await getAccessToken();
 
 export const createConnection = createAsyncThunk(
   "connection/createConnection",
-  async (user) => {
+  async (user, { dispatch }) => {
     try {
       const connectionData = {
         loginId: "gavinBelson",
@@ -29,6 +30,7 @@ export const createConnection = createAsyncThunk(
       return response.data;
     } catch (error) {
       console.error("Error creating connection:", error);
+      dispatch(setError(error.message));
       throw error;
     }
   }

@@ -1,22 +1,11 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import "./DataDisplay.css";
-//import { getTransactions } from "../store/transaction";
 
 const DataDisplay = () => {
-  //const dispatch = useDispatch();
   const transactions = useSelector((state) => state.transaction.transactions);
   const currentStep = useSelector((state) => state.transaction.currentStep);
-
-  //   useEffect(() => {
-  //     dispatch(getTransactions());
-  //   }, [dispatch]);
-
-  //   useEffect(() => {
-  //     if (!loading && transactions?.length > 0) {
-  //       calculateAverageSpendingByCategory();
-  //     }
-  //   }, [loading, transactions]);
+  const error = useSelector((state) => state.error);
 
   //pravim objekat koji ce da ima naziv kategorije i u objektu njihove ukupne sume koje i broj transakcija od kog posle pravim srednju vrednost
 
@@ -69,18 +58,7 @@ const DataDisplay = () => {
             <th>Average Consumption</th>
           </tr>
         </thead>
-        {/* <tbody>
-          {Object.entries(averageSpendingByCategory).map(
-            //object.entries pretvara objekat u niz parova kljuc vrednost
-            ([category, { average, categoryName }]) => (
-              <tr key={category}>
-                <td>{category}</td>
-                <td>{categoryName}</td>
-                <td>{Math.abs(average)}</td>
-              </tr>
-            )
-          )}
-        </tbody> */}
+
         {transactions?.length > 0 ? (
           <tbody>
             {Object.entries(averageSpendingByCategory).map(
@@ -96,7 +74,11 @@ const DataDisplay = () => {
         ) : (
           <tbody>
             <tr>
-              <td colSpan={3}>{currentStep}</td>
+              {error ? (
+                <td colSpan={3}>{error}</td>
+              ) : (
+                <td colSpan={3}>{currentStep}</td>
+              )}
             </tr>
           </tbody>
         )}

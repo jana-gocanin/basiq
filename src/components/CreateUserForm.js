@@ -4,7 +4,7 @@ import { createUser } from "../store/user";
 import "./CreateUserForm.css";
 import ErrorNotification from "./ErrorNotification";
 import validateMobile from "../store/validation";
-import { setError } from "../store/error";
+import { setError, clearError } from "../store/error";
 import { createConnection } from "../store/connection";
 import { getTransactions } from "../store/transaction";
 import { setCurrentStep } from "../store/transaction";
@@ -13,11 +13,14 @@ import { useEffect } from "react";
 const CreateUserForm = () => {
   const dispatch = useDispatch();
   const error = useSelector((state) => state.error);
-  const currentStep = useSelector((state) => state.transaction.currentStep);
   useEffect(() => {
-    // Podešavanje currentStep prilikom montiranja komponente
+    // Podesavanje currentStep prilikom pravljenja komponente
     dispatch(setCurrentStep("waiting for a user"));
   }, [dispatch]);
+
+  const handleChange = () => {
+    dispatch(clearError());
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -36,18 +39,11 @@ const CreateUserForm = () => {
       const createdUser = await dispatch(createUser(user));
 
       //kreiram konekciju za korisnika
-      //   if (createdUser.payload) {
-      //     const connectionUser = {
-      //       id: createdUser.payload.id,
-      //     };
 
       const createdConnection = await dispatch(
         createConnection(createdUser.payload)
       );
       dispatch(setCurrentStep("fetching data"));
-      //}
-      //console.log(createdUser.payload);
-      //await dispatch(connection(createdUser.payload.id));
       await dispatch(
         getTransactions({
           user: createdUser.payload,
@@ -62,7 +58,6 @@ const CreateUserForm = () => {
       );
     }
     dispatch(setCurrentStep("done"));
-    //dispatch(createUser(user));
   };
 
   return (
@@ -70,22 +65,21 @@ const CreateUserForm = () => {
       <h2>Create User</h2>
       <div>
         <label>Email:</label>
-        <input type="email" name="email" required />
+        <input type="email" name="email" required onChange={handleChange} />
       </div>
       <div>
         <label>Mobile:</label>
-        <input type="tel" name="mobile" required />
+        <input type="tel" name="mobile" required onChange={handleChange} />
       </div>
       <div>
         <label>First Name:</label>
-        <input type="text" name="firstName" />
+        <input type="text" name="firstName" onChange={handleChange} />
       </div>
       <div>
         <label>Last Name:</label>
-        <input type="text" name="lastName" />
+        <input type="text" name="lastName" onChange={handleChange} />
       </div>
       <button type="submit">Create</button>
-      {/* <p>Current Step: {currentStep}</p> */}
       {error && <ErrorNotification />}
     </form>
   );

@@ -21,3 +21,8 @@
   color: #fff;
   background-color: #007bff;
 }
+
+.step.error {
+  color: #fff;
+  background-color: rgb(236, 45, 45);
+}

@@ -1,11 +1,10 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { getAccessToken } from "../store/api";
-
+import { setError } from "./error";
 const initialState = {
   username: "",
   password: "",
-  spendingData: [],
   firstName: "",
   lastName: "",
   email: "",
@@ -14,33 +13,30 @@ const initialState = {
 };
 const accessToken = await getAccessToken();
 
-export const createUser = createAsyncThunk("user/createUser", async (user) => {
-  try {
-    const response = await axios.post("https://au-api.basiq.io/users", user, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-      },
-    });
+export const createUser = createAsyncThunk(
+  "user/createUser",
+  async (user, { dispatch }) => {
+    try {
+      const response = await axios.post("https://au-api.basiq.io/users", user, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+      });
 
-    return response.data;
-  } catch (error) {
-    console.error("Error creating user:", error);
-    throw error;
+      return response.data;
+    } catch (error) {
+      console.error("Error creating user:", error);
+      dispatch(setError(error.message));
+      throw error;
+    }
   }
-});
+);
 
 const userSlice = createSlice({
   name: "user",
   initialState,
-  reducers: {
-    updateUser: (state, action) => {
-      state = { ...state, ...action.payload };
-    },
-    setSpendingData: (state, action) => {
-      state.spendingData = action.payload;
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder.addCase(createUser.fulfilled, (state, action) => {
       const userData = action.payload;
@@ -58,27 +54,4 @@ const userSlice = createSlice({
   },
 });
 
-// const initialState = {
-//   username: "",
-//   password: "",
-//   spendingData: [], // Dodajemo polje za podatke o potrošnji
-// };
-
-// const userSlice = createSlice({
-//   name: "user",
-//   initialState,
-//   reducers: {
-//     updateUser: (state, action) => {
-//       return {
-//         ...state,
-//         ...action.payload,
-//       };
-//     },
-//     setSpendingData: (state, action) => {
-//       state.spendingData = action.payload;
-//     },
-//   },
-// });
-
-export const { updateUser, setSpendingData } = userSlice.actions;
 export default userSlice.reducer;
