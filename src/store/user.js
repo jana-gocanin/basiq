@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { getAccessToken } from "../store/api";
 import { setError } from "./error";
+import { BASE_URL } from "../store/api";
 const initialState = {
   username: "",
   password: "",
@@ -9,7 +10,6 @@ const initialState = {
   lastName: "",
   email: "",
   mobile: "",
-  type: "",
 };
 const accessToken = await getAccessToken();
 
@@ -17,7 +17,7 @@ export const createUser = createAsyncThunk(
   "user/createUser",
   async (user, { dispatch }) => {
     try {
-      const response = await axios.post("https://au-api.basiq.io/users", user, {
+      const response = await axios.post(`${BASE_URL}/users`, user, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
@@ -45,11 +45,9 @@ const userSlice = createSlice({
       state.email = userData.email;
       state.mobile = userData.mobile;
       state.error = null;
-      state.type = userData.type;
     });
     builder.addCase(createUser.rejected, (state, action) => {
       state.error = action.error.message;
-      state.type = "user";
     });
   },
 });

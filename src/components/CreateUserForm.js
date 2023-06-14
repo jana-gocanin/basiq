@@ -5,7 +5,7 @@ import "./CreateUserForm.css";
 import ErrorNotification from "./ErrorNotification";
 import validateMobile from "../store/validation";
 import { setError, clearError } from "../store/error";
-import { createConnection } from "../store/connection";
+import { createConnection, refreshConnection } from "../store/connection";
 import { getTransactions } from "../store/transaction";
 import { setCurrentStep } from "../store/transaction";
 import { useEffect } from "react";
@@ -44,12 +44,54 @@ const CreateUserForm = () => {
         createConnection(createdUser.payload)
       );
       dispatch(setCurrentStep("fetching data"));
-      await dispatch(
+      // await dispatch(
+      //   getTransactions({
+      //     user: createdUser.payload,
+      //     connection: createdConnection,
+      //   })
+      // ); //prosledi connecton
+      const transactionResult = await dispatch(
         getTransactions({
           user: createdUser.payload,
           connection: createdConnection,
         })
-      ); //prosledi connecton
+      );
+
+      let connectionId = transactionResult.payload.steps[0].result.url
+        .split("/")
+        .pop();
+
+      // setTimeout(async () => {
+      //   await dispatch(
+      //     refreshConnection({
+      //       connectionId: connectionId,
+      //       user: createdUser.payload,
+      //     })
+      //   );
+      // }, 10000);
+      const refreshInterval = setInterval(async () => {
+        const refreshedConnection = await dispatch(
+          refreshConnection({
+            connectionId: connectionId,
+            user: createdUser.payload,
+          })
+        );
+
+        const newConnection = refreshedConnection.payload;
+
+        const transactionResult = await dispatch(
+          getTransactions({
+            user: createdUser.payload,
+            connection: newConnection,
+          })
+        );
+
+        connectionId = transactionResult.payload.steps[0].result.url
+          .split("/")
+          .pop();
+
+        // Ostatak koda
+      }, 60000); // 60 sekundi
     } else {
       dispatch(
         setError(

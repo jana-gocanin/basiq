@@ -5,9 +5,10 @@ const apiKey =
   "OTY2ZGNlOTYtYTVhYS00MTRhLWE1OGQtMDU1NTkzM2E2ODM3OjhkMmNmOGY0LTI3NmEtNDFlZC05ZWE5LTk0MDQ2MTkxMTAxZQ==";
 const accessTokenEndpoint = `${apiEndpoint}/token`;
 
+export const BASE_URL = "https://au-api.basiq.io";
+
 export const getAccessToken = async () => {
   const authHeader = `Basic ${apiKey}`;
-  //const data = "scope=CLIENT_ACCESS";
 
   try {
     const response = await axios.post(
@@ -32,12 +33,32 @@ export const getAccessToken = async () => {
 
 const refreshAccessToken = async () => {
   try {
-    const accessToken = await getAccessToken();
-
-    //console.log("New access token:", accessToken);
+    await getAccessToken();
   } catch (error) {
     console.error("Error refreshing access token:", error);
+  } finally {
+    setTimeout(refreshAccessToken, 3600000); //nece se desiti da se pozove pre nego sto je dobijen token iz try bloka
   }
 };
 
-setInterval(refreshAccessToken, 3600000);
+refreshAccessToken();
+
+// const api = axios.create({
+//   baseURL: BASE_URL,
+//   headers: {
+//     Authorization: `Bearer ${getAccessToken()}`,
+//     "Content-Type": "application/json",
+//   },
+// });
+
+// export default api;
+
+// const refreshAccessToken = async () => {
+//   try {
+//     const accessToken = await getAccessToken();
+//   } catch (error) {
+//     console.error("Error refreshing access token:", error);
+//   }
+// };
+
+// setInterval(refreshAccessToken, 3600000);
