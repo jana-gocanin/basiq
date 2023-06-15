@@ -8,13 +8,16 @@ import { setError, clearError } from "../store/error";
 import { createConnection, refreshConnection } from "../store/connection";
 import { getTransactions } from "../store/transaction";
 import { setCurrentStep } from "../store/transaction";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const CreateUserForm = () => {
   const dispatch = useDispatch();
   const error = useSelector((state) => state.error);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [connectionId, setConnectionId] = useState(null);
+  const [createdUser, setCreatedUser] = useState(null);
+
   useEffect(() => {
-    // Podesavanje currentStep prilikom pravljenja komponente
     dispatch(setCurrentStep("waiting for a user"));
   }, [dispatch]);
 
@@ -34,72 +37,61 @@ const CreateUserForm = () => {
 
     const valid = validateMobile(user.mobile);
     if (valid) {
-      //kreiram korisnika
       dispatch(setCurrentStep("verifying"));
       const createdUser = await dispatch(createUser(user));
-
-      //kreiram konekciju za korisnika
-
       const createdConnection = await dispatch(
         createConnection(createdUser.payload)
       );
       dispatch(setCurrentStep("fetching data"));
-      // await dispatch(
-      //   getTransactions({
-      //     user: createdUser.payload,
-      //     connection: createdConnection,
-      //   })
-      // ); //prosledi connecton
       const transactionResult = await dispatch(
         getTransactions({
           user: createdUser.payload,
           connection: createdConnection,
         })
       );
-
-      let connectionId = transactionResult.payload.steps[0].result.url
+      const connectionId = transactionResult.payload.steps[0].result.url
         .split("/")
         .pop();
 
-      // setTimeout(async () => {
-      //   await dispatch(
-      //     refreshConnection({
-      //       connectionId: connectionId,
-      //       user: createdUser.payload,
-      //     })
-      //   );
-      // }, 10000);
-      const refreshInterval = setInterval(async () => {
-        const refreshedConnection = await dispatch(
-          refreshConnection({
-            connectionId: connectionId,
-            user: createdUser.payload,
-          })
-        );
-
-        const newConnection = refreshedConnection.payload;
-
-        const transactionResult = await dispatch(
-          getTransactions({
-            user: createdUser.payload,
-            connection: newConnection,
-          })
-        );
-
-        connectionId = transactionResult.payload.steps[0].result.url
-          .split("/")
-          .pop();
-
-        // Ostatak koda
-      }, 60000); // 60 sekundi
+      setCreatedUser(createdUser);
+      setConnectionId(connectionId);
     } else {
       dispatch(
         setError(
-          "Invalid mobile number Please try again. Number must start with a + and have 6 or 7 digits after the country code."
+          "Invalid mobile number. Please try again. Number must start with a + and have 6 or 7 digits after the country code."
         )
       );
     }
     dispatch(setCurrentStep("done"));
+  };
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    dispatch(setCurrentStep("fetching data"));
+
+    const refreshedConnection = await dispatch(
+      refreshConnection({
+        connectionId: connectionId,
+        user: createdUser.payload,
+      })
+    );
+
+    const newConnection = refreshedConnection.payload;
+
+    const transactionResult = await dispatch(
+      getTransactions({
+        user: createdUser.payload,
+        connection: newConnection,
+      })
+    );
+    dispatch(setCurrentStep("done"));
+
+    const updatedConnectionId = transactionResult.payload.steps[0].result.url
+      .split("/")
+      .pop();
+
+    setConnectionId(updatedConnectionId);
+    setIsRefreshing(false);
   };
 
   return (
@@ -122,6 +114,14 @@ const CreateUserForm = () => {
         <input type="text" name="lastName" onChange={handleChange} />
       </div>
       <button type="submit">Create</button>
+      <button
+        id="refresh-button"
+        type="button"
+        onClick={handleRefresh}
+        disabled={!connectionId || isRefreshing}
+      >
+        Refresh
+      </button>
       {error && <ErrorNotification />}
     </form>
   );
