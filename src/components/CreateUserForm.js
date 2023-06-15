@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 const CreateUserForm = () => {
   const dispatch = useDispatch();
   const error = useSelector((state) => state.error);
+  const step = useSelector((state) => state.transaction.currentStep);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [connectionId, setConnectionId] = useState(null);
   const [createdUser, setCreatedUser] = useState(null);
@@ -23,6 +24,7 @@ const CreateUserForm = () => {
 
   const handleChange = () => {
     dispatch(clearError());
+    dispatch(setCurrentStep("waiting for a user"));
   };
 
   const handleSubmit = async (e) => {
@@ -121,7 +123,12 @@ const CreateUserForm = () => {
         <label>Last Name:</label>
         <input type="text" name="lastName" onChange={handleChange} />
       </div>
-      <button type="submit">Create</button>
+      <button
+        type="submit"
+        disabled={step === "verifying" || step === "fetching data"}
+      >
+        Create
+      </button>
       <button
         id="refresh-button"
         type="button"
