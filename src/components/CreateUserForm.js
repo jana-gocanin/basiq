@@ -34,6 +34,14 @@ const CreateUserForm = () => {
       firstName: e.target.firstName.value,
       lastName: e.target.lastName.value,
     };
+    if (
+      user.firstName === "" ||
+      user.lastName === "" ||
+      (user.email === "" && user.mobile === "")
+    ) {
+      dispatch(setError("Please fill out required fields."));
+      return;
+    }
 
     const valid = validateMobile(user.mobile);
     if (valid) {
