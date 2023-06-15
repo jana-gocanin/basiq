@@ -11,11 +11,6 @@ const ProgressIndicator = () => {
   const getStepIndex = () => {
     return steps.indexOf(currentStep);
   };
-
-  // const isStepError = (step) => {
-  //   return error && steps.indexOf(step) <= getStepIndex();
-  // };
-
   const isStepError = (step) => {
     return error;
   };
@@ -28,6 +23,7 @@ const ProgressIndicator = () => {
           className={`step ${isStepError(step) ? "error" : ""} ${
             index <= getStepIndex() ? "active" : ""
           }`}
+          data-testid="step"
         >
           {step}
         </div>
