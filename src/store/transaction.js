@@ -16,7 +16,7 @@ const checkJobStatus = async (jobId, user) => {
   const jobStatus = jobStatusResponse.data;
 
   if (jobStatus.steps.every((step) => step.status === "success")) {
-    // Svi koraci su uspešno dovršeni, uzmi transakcije
+    // sve je uspelo, uzmi transakcije
 
     const transactions = [];
     try {
@@ -42,10 +42,10 @@ const checkJobStatus = async (jobId, user) => {
       steps: jobStatus.steps,
     };
   } else if (jobStatus.steps.some((step) => step.status === "failed")) {
-    // Postoji neuspešan korak u poslu
+    // neki korak nije uspeo
     throw new Error("Job execution failed");
   } else {
-    // I dalje je u toku, proveri ponovno nakon određenog vremena
+    // Postoji bar jedan korak koji nije zavrsen, proveri ponovo za 2 sekunde
 
     await new Promise((resolve) => setTimeout(resolve, 2000)); //resolve ce se desiti nakon 2 sekunde
     return checkJobStatus(jobId, user);
@@ -66,68 +66,6 @@ export const getTransactions = createAsyncThunk(
     }
   }
 );
-
-// export const getTransactions = createAsyncThunk(
-//   "transaction/getTransactions",
-//   async ({ user, connection }, { dispatch }) => {
-//     try {
-//       const jobId = connection.payload.id;
-
-//       const checkJobStatus = async () => {
-//         const jobStatusResponse = await axios.get(`${BASE_URL}/jobs/${jobId}`, {
-//           headers: {
-//             Authorization: `Bearer ${accessToken}`,
-//           },
-//         });
-
-//         const jobStatus = jobStatusResponse.data;
-
-//         if (jobStatus.steps.every((step) => step.status === "success")) {
-//           // Svi koraci su uspešno dovršeni, uzmi transakcije
-
-//           const transactions = [];
-//           try {
-//             let nextLink = ` ${BASE_URL}/users/${user?.id}/transactions`;
-
-//             while (nextLink) {
-//               const response = await axios.get(nextLink, {
-//                 headers: {
-//                   Authorization: `Bearer ${accessToken}`,
-//                 },
-//               });
-
-//               transactions.push(...response.data.data);
-//               nextLink = response?.data?.links?.next;
-//             }
-//           } catch (error) {
-//             console.error("Error getting transactions:", error);
-//             dispatch(setError(error.message));
-//             throw error;
-//           }
-
-//           return {
-//             transactions: transactions,
-//             steps: jobStatus.steps,
-//           };
-//         } else if (jobStatus.steps.some((step) => step.status === "failed")) {
-//           // Postoji neuspešan korak u poslu
-//           throw new Error("Job execution failed");
-//         } else {
-//           // I dalje je u toku, proveri ponovno nakon određenog vremena
-
-//           await new Promise((resolve) => setTimeout(resolve, 2000)); //resolve ce se desiti nakon 2 sekunde
-//           return checkJobStatus();
-//         }
-//       };
-//       const transactionResult = await checkJobStatus();
-//       return transactionResult;
-//     } catch (error) {
-//       console.error("Error getting transactions:", error);
-//       dispatch(setError(error.message));
-//       throw error;
-//     }
-//   }
-// );
 
 const transactionSlice = createSlice({
   name: "transaction",

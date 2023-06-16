@@ -62,6 +62,7 @@ const DataDisplay = () => {
         {transactions?.length > 0 ? (
           <tbody>
             {Object.entries(averageSpendingByCategory).map(
+              //pretvara objekat u niz parova kljuc vrednost
               ([category, { average, categoryName }]) => (
                 <tr key={category}>
                   <td>{category}</td>
