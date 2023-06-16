@@ -4,12 +4,11 @@ import { getAccessToken } from "../store/api";
 import { setError } from "./error";
 import { BASE_URL } from "../store/api";
 const initialState = {
-  username: "",
-  password: "",
   firstName: "",
   lastName: "",
   email: "",
   mobile: "",
+  createdUser: null,
 };
 const accessToken = await getAccessToken();
 
@@ -36,7 +35,11 @@ export const createUser = createAsyncThunk(
 const userSlice = createSlice({
   name: "user",
   initialState,
-  reducers: {},
+  reducers: {
+    setCreatedUser: (state, action) => {
+      state.createdUser = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(createUser.fulfilled, (state, action) => {
       const userData = action.payload;
@@ -51,5 +54,5 @@ const userSlice = createSlice({
     });
   },
 });
-
+export const { setCreatedUser } = userSlice.actions.setCreatedUser;
 export default userSlice.reducer;

@@ -9,13 +9,16 @@ import { createConnection, refreshConnection } from "../store/connection";
 import { getTransactions } from "../store/transaction";
 import { setCurrentStep } from "../store/transaction";
 import { useEffect, useState } from "react";
+import { setConnectionId } from "../store/connection";
 
 const CreateUserForm = () => {
   const dispatch = useDispatch();
   const error = useSelector((state) => state.error);
   const step = useSelector((state) => state.transaction.currentStep);
+  const connectionId = useSelector((state) => state.connection.connectionId);
+
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [connectionId, setConnectionId] = useState(null);
+  //const [connectionId, setConnectionId] = useState(null);
   const [createdUser, setCreatedUser] = useState(null);
 
   useEffect(() => {
@@ -64,7 +67,7 @@ const CreateUserForm = () => {
         .pop();
 
       setCreatedUser(createdUser);
-      setConnectionId(connectionId);
+      dispatch(setConnectionId(connectionId));
     } else {
       dispatch(
         setError(
@@ -100,7 +103,7 @@ const CreateUserForm = () => {
       .split("/")
       .pop();
 
-    setConnectionId(updatedConnectionId);
+    dispatch(setConnectionId(updatedConnectionId));
     setIsRefreshing(false);
   };
 

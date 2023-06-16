@@ -68,7 +68,11 @@ const connectionSlice = createSlice({
     connectionId: null,
     //type: null,
   },
-  reducers: {},
+  reducers: {
+    setConnectionId: (state, action) => {
+      state.connectionId = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(createConnection.pending, (state) => {
       state.loading = true;
@@ -101,5 +105,5 @@ const connectionSlice = createSlice({
     });
   },
 });
-
+export const setConnectionId = connectionSlice.actions.setConnectionId;
 export default connectionSlice.reducer;
