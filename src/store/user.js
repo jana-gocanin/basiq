@@ -8,7 +8,7 @@ const initialState = {
   lastName: "",
   email: "",
   mobile: "",
-  createdUser: null,
+  id: "",
 };
 const accessToken = await getAccessToken();
 
@@ -35,11 +35,7 @@ export const createUser = createAsyncThunk(
 const userSlice = createSlice({
   name: "user",
   initialState,
-  reducers: {
-    setCreatedUser: (state, action) => {
-      state.createdUser = action.payload;
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder.addCase(createUser.fulfilled, (state, action) => {
       const userData = action.payload;
@@ -47,6 +43,7 @@ const userSlice = createSlice({
       state.lastName = userData.lastName;
       state.email = userData.email;
       state.mobile = userData.mobile;
+      state.id = userData.id;
       state.error = null;
     });
     builder.addCase(createUser.rejected, (state, action) => {
@@ -54,5 +51,5 @@ const userSlice = createSlice({
     });
   },
 });
-export const { setCreatedUser } = userSlice.actions.setCreatedUser;
+
 export default userSlice.reducer;
